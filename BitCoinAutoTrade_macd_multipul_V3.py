@@ -39,8 +39,8 @@ def get_current_price(ticker):
 #로그인
 upbit = pyupbit.Upbit(access, secret)
 #INPUT 값 받기
-#coin = sys.argv[1]
-coin = "DOGE"
+coin = sys.argv[1]
+#coin = "DOGE"
 file_name = "multipul_log-"+coin+".txt"
 file = open(file_name, 'w')
 file.write("autotrade start \n")
@@ -261,19 +261,11 @@ while True:
         # 원화잔고
         current_krw = get_balance("KRW")
         
-        print(dnag_jang[40])
-        print(dnag_jang[41])
-        print(dnag_jang[42])
-        print(dnag_jang[42] - macd_signal[42])
-        print(dnag_jang[42] - dnag_jang[41])
-        print(dnag_jang[41] - dnag_jang[40])
-        print(macd_signal[42])
-        print("-------------------------------------------------")
 
 
         
         if krw == 0:
-            if dnag_jang[42] - dnag_jang[41] >= 0 and dnag_jang[41] - dnag_jang[40] < 0 and macd_signal[42] < 0:
+            if dnag_jang[42] - dnag_jang[41] >= 0 and dnag_jang[41] - dnag_jang[40] < 0 and macd_signal[42] < 0 and cci_price[42] < -100 and rsi_arr[29] < 40:
                 #krw = current_krw / 100
                 krw = 10000
                 buy_money = current_price
@@ -376,8 +368,8 @@ while True:
         #        krw = 0
         #        rsi_gubun = 0
 
-        time.sleep(30)
+        time.sleep(3)
     except Exception as e:
         print(e)
         file.close()
-        time.sleep(30)
+        time.sleep(3)
