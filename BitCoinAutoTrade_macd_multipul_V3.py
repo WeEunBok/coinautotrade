@@ -237,7 +237,7 @@ while True:
             #print("avg_26day[i] : %f" % avg_26day[i])
 
 
-            dnag_jang[i] = avg_12day[i] - avg_26day[i]
+            dnag_jang[i] = (avg_12day[i] - avg_26day[i])
             #print("dnag_jang[i] : %f" % dnag_jang[i])
 
             if i > 33:
@@ -247,7 +247,7 @@ while True:
             signal9[i] = (signal9[i] / 9)
             #print("signal9[i] : %f" % signal9[i])
 
-            macd_signal[i] = dnag_jang[i] - signal9[i]
+            macd_signal[i] = (dnag_jang[i] - signal9[i])
             #print("macd_signal[i] : %f" % macd_signal[i])
         ##########################################################################
         #macd start                                                              #
@@ -265,7 +265,7 @@ while True:
 
         
         if krw == 0:
-            if dnag_jang[42] - dnag_jang[41] >= 0 and dnag_jang[41] - dnag_jang[40] < 0 and macd_signal[42] < 0 and cci_price[42] < -100 and rsi_arr[29] < 40:
+            if (dnag_jang[42] - dnag_jang[41]) >= 0 and (dnag_jang[41] - dnag_jang[40]) < 0 and macd_signal[42] < 0 and cci_price[42] < -100 and rsi_arr[29] < 40:
                 #krw = current_krw / 100
                 krw = 10000
                 buy_money = current_price
