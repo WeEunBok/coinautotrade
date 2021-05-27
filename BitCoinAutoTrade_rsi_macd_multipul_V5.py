@@ -51,8 +51,8 @@ def get_macd(price, slow, fast, smooth):
 #로그인
 upbit = pyupbit.Upbit(access, secret)
 #INPUT 값 받기
-#coin = sys.argv[1]
-coin = "BTC"
+coin = sys.argv[1]
+#coin = "BTC"
 file_name = "multipul_log-"+coin+".txt"
 file = open(file_name, 'w')
 file.write("autotrade start \n")
@@ -197,7 +197,7 @@ while True:
 
         
         if krw == 0:
-            if (macd_price.macd[199] - macd_price.macd[198]) >= 0 and (macd_price.macd[198] - macd_price.macd[197]) < 0 and macd_price.macd_osc[199] < 0 and rsi_arr[186] < 35:
+            if (macd_price.macd[199] - macd_price.macd[198]) >= 0 and (macd_price.macd[198] - macd_price.macd[197]) >= 0 and (macd_price.macd[197] - macd_price.macd[196]) < 0 and macd_price.macd_osc[198] < 0 and rsi_arr[186] < 35:
                 #krw = current_krw / 100
                 krw = 10000
                 buy_money = current_price
@@ -211,7 +211,7 @@ while True:
 
         if krw != 0:
             #rsi 60이상(과매수시) 매도
-            if ((macd_price.macd[199] - macd_price.macd[198]) <= 0 and macd_price.macd_osc[199] > 0) or rsi_arr[186] > 60:
+            if ((macd_price.macd[198] - macd_price.macd[197]) <= 0 and macd_price.macd_osc[198] > 0) or rsi_arr[186] > 60:
                 coin_price = get_balance(coin)
                 #upbit.sell_market_order(KRW_coin, coin_price) # 비트코인 전량 매도
                 data = "now_date : %s --- SELL_COIN! : %s \n" % (datetime.datetime.now(), current_price)
@@ -227,7 +227,7 @@ while True:
             if rsi_arr[186] < 35 or macd_price.macd_osc[199] > 0:
                 rsi_gubun = 1
         elif rsi_gubun == 1:
-            if rsi_arr[186] < 35 and macd_price.macd_osc[199] < 0:
+            if rsi_arr[186] < 35 and macd_price.macd_osc[198] < 0:
                 #krw = current_krw / 100
                 
                 data = "now_date : %s --- BUY_COIN2! : %s \n" % (datetime.datetime.now(), current_price)
