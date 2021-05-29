@@ -52,7 +52,7 @@ def get_macd(price, slow, fast, smooth):
 upbit = pyupbit.Upbit(access, secret)
 #INPUT 값 받기
 coin = sys.argv[1]
-#coin = "BTC"
+#coin = "ETC"
 file_name = "multipul_log-"+coin+".txt"
 file = open(file_name, 'w')
 file.write("autotrade start \n")
@@ -75,20 +75,20 @@ file.flush()
 
 #2차원 배열 선얼 [14][30]
 #당일 - 전일 상승분 배열
-up_arr   = numpy.zeros((30, 14))
+up_arr   = numpy.zeros((187, 14))
 #당일 - 전일 하락분 배열
-down_arr = numpy.zeros((30, 14))
+down_arr = numpy.zeros((187, 14))
 #1차 배열
 #상승분 평균
-avg_up   = numpy.zeros((30))
+avg_up   = numpy.zeros((187))
 #하락분 평균
-avg_down = numpy.zeros((30))
+avg_down = numpy.zeros((187))
 #rsi 상승분 기초데이터
-rsi_base_up   = numpy.zeros((30))
+rsi_base_up   = numpy.zeros((187))
 #rsi 하락분 기초데이터
-rsi_base_down = numpy.zeros((30))
+rsi_base_down = numpy.zeros((187))
 #rsi 계산 최종 데이터
-rsi_arr = numpy.zeros(30)
+rsi_arr = numpy.zeros(187)
 
 #cci
 avg_HLC   = numpy.zeros((43))
@@ -97,12 +97,7 @@ sum_avg_cal = numpy.zeros((43))
 avg_sum_avg_cal = numpy.zeros((43))
 cci_price = numpy.zeros((43))
 
-#macd
-avg_12day   = numpy.zeros((43))
-avg_26day   = numpy.zeros((43))
-dnag_jang   = numpy.zeros((43))
-signal9     = numpy.zeros((43))
-macd_signal = numpy.zeros((43))
+macd_price = numpy.zeros((200))
 
 # 자동매매 시작
 while True:
@@ -111,31 +106,34 @@ while True:
 
         #2차원 배열 선얼 [14][30]
         #당일 - 전일 상승분 배열
-        up_arr   = numpy.zeros((30, 14))
+        up_arr   = numpy.zeros((187, 14))
         #당일 - 전일 하락분 배열
-        down_arr = numpy.zeros((30, 14))
+        down_arr = numpy.zeros((187, 14))
         #1차 배열
         #상승분 평균
-        avg_up   = numpy.zeros((30))
+        avg_up   = numpy.zeros((187))
         #하락분 평균
-        avg_down = numpy.zeros((30))
+        avg_down = numpy.zeros((187))
         #rsi 상승분 기초데이터
-        rsi_base_up   = numpy.zeros((30))
+        rsi_base_up   = numpy.zeros((187))
         #rsi 하락분 기초데이터
-        rsi_base_down = numpy.zeros((30))
+        rsi_base_down = numpy.zeros((187))
         #rsi 계산 최종 데이터
-        rsi_arr = numpy.zeros(30)
+        rsi_arr = numpy.zeros(187)
+
+        #macd 초기화
+        macd_price = numpy.zeros((200))
 
             
         #1분봉 43개 가지고오기
-        minute_ohlcv = pyupbit.get_ohlcv(KRW_coin, interval="minute1", count=43)
+        minute_ohlcv = pyupbit.get_ohlcv(KRW_coin, interval="minute1", count=200)
 
         i = 0
         j = 0
         ##########################################################################
         #rsi start                                                               #
         ##########################################################################
-        for i in range(0,30):
+        for i in range(0,187):
             sum_up = 0
             sum_down = 0
 
@@ -161,7 +159,7 @@ while True:
             avg_up[i]    = (sum_up / 14)
             avg_down[i]  = (sum_down / 14)
 
-        for i in range(0,30):
+        for i in range(0,187):
             if i == 0:
                 rsi_base_up[i]   = avg_up[i]
                 rsi_base_down[i] = avg_down[i]
@@ -180,7 +178,7 @@ while True:
         #macd start                                                              #
         ##########################################################################
         
-        minute_ohlcv = pyupbit.get_ohlcv(KRW_coin, interval="minute1", count=200)
+        #minute_ohlcv = pyupbit.get_ohlcv(KRW_coin, interval="minute1", count=200)
         macd_price = get_macd(minute_ohlcv['close'], 26, 12, 9)
 
         ##########################################################################
@@ -199,24 +197,24 @@ while True:
 
         
         if krw == 0:
-            if (macd_price.macd[199] - macd_price.macd[198]) >= 0 and (macd_price.macd[198] - macd_price.macd[197]) < 0 and macd_price.macd_osc[199] < 0 and rsi_arr[29] < 35:
+            if (macd_price.macd[199] - macd_price.macd[198]) >= 0 and (macd_price.macd[198] - macd_price.macd[197]) >= 0 and (macd_price.macd[197] - macd_price.macd[196]) < 0 and macd_price.macd_osc[198] < 0 and rsi_arr[186] < 35:
                 #krw = current_krw / 100
                 krw = 10000
                 buy_money = current_price
                 #if krw > 5000:
                 if current_krw >= krw:
                     #upbit.buy_market_order(KRW_coin, krw*0.9995) # 비트코인 매수
-                    data = "now_date : %s / BUY_COIN!! : %f \n" % (datetime.datetime.now(), current_price)
+                    data = "now_date : %s --- BUY_COIN!! : %s  rsi : %s macd : %s / %s / %s\n" % (datetime.datetime.now(), current_price, rsi_arr[186], macd_price.macd[196], macd_price.macd[197], macd_price.macd[198])
                     file.write(data)
                     file.flush()
                     rsi_gubun = -1
 
         if krw != 0:
             #rsi 60이상(과매수시) 매도
-            if (macd_price.macd[199] - macd_price.macd[198]) <= 0 or rsi_arr[29] > 60:
+            if ((macd_price.macd[198] - macd_price.macd[197]) <= 0 and macd_price.macd_osc[198] > 0) or rsi_arr[186] > 60:
                 coin_price = get_balance(coin)
                 #upbit.sell_market_order(KRW_coin, coin_price) # 비트코인 전량 매도
-                data = "now_date : %s / SELL_COIN! : %f \n" % (datetime.datetime.now(), current_price)
+                data = "now_date : %s --- SELL_COIN! : %s  rsi : %s macd : %s / %s / %s\n" % (datetime.datetime.now(), current_price, rsi_arr[186], macd_price.macd[196], macd_price.macd[197], macd_price.macd[198])
                 file.write(data)
                 file.flush()
                 buy_money = 0
@@ -224,29 +222,31 @@ while True:
                 rsi_gubun = 0
         
         
-        #추가매수 비법?
-        #if rsi_gubun == -1:
-        #    if rsi_arr[29] > 35 or cci_price[42] > -100 or macd_signal[42] >= 0:
-        #        rsi_gubun = 1
-        #elif rsi_gubun == 1:
-        #    if rsi_arr[29] < 35 and cci_price[42] < -100 and macd_signal[42] < 0:
-        #        #krw = current_krw / 100
-        #        if current_price > avg_price:
-        #            krw = 9000
-        #        elif current_price == avg_price:
-        #            krw = 10000
-        #        else:
-        #            krw = 11000
-        #            
-        #        buy_money = current_price
-        #        #if krw > 5000:
-        #        if current_krw >= krw:
-        #            #upbit.buy_market_order(KRW_coin, krw*0.9995) # 비트코인 매수
-        #            data = "BUY_COIN2!  : %f \n" % current_price
-        #            file.write(data)
-        #            file.flush()
-        #
-        #            rsi_gubun = -1
+        #추가매수 비법
+        if rsi_gubun == -1:
+            if rsi_arr[186] > 35 or macd_price.macd_osc[199] > 0:
+                rsi_gubun = 1
+        elif rsi_gubun == 1:
+            if rsi_arr[186] < 35 and macd_price.macd_osc[198] < 0:
+                #krw = current_krw / 100
+                
+                data = "now_date : %s --- BUY_COIN2! : %s  rsi : %s macd : %s / %s / %s\n" % (datetime.datetime.now(), current_price, rsi_arr[186], macd_price.macd[196], macd_price.macd[197], macd_price.macd[198])
+                rsi_gubun = -1
+
+                #if current_price > avg_price:
+                #    krw = 9000
+                #elif current_price == avg_price:
+                #    krw = 10000
+                #else:
+                #    krw = 11000
+                    
+                #buy_money = current_price
+                #if current_krw >= krw:
+                #    #upbit.buy_market_order(KRW_coin, krw*0.9995) # 비트코인 매수
+                #    data = "now_date : %s --- BUY_COIN2! : %f \n" % (datetime.datetime.now(), current_price)
+                #    file.write(data)
+                #    file.flush()
+                #    rsi_gubun = -1
 
 
         
@@ -302,8 +302,8 @@ while True:
         #        krw = 0
         #        rsi_gubun = 0
 
-        time.sleep(3)
+        time.sleep(30)
     except Exception as e:
         print(e)
         file.close()
-        time.sleep(3)
+        time.sleep(30)
